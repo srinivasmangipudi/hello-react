@@ -29,7 +29,7 @@ var TodoApp = React.createClass ({
   },
   render: function() {
     return(
-      <div className="TodoList">
+      <div className="TodoList shadow">
         <h3>TODOs</h3>
         <TodoList items={this.state.items} />
         <form onSubmit={this.handleSubmit}>

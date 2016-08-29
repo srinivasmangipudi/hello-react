@@ -1,12 +1,8 @@
-.TodoList {
+.awareCanvas {
   border: 2px solid black;
   text-align: center;
   background: #f5f5f5;
   color: #333;
   margin: 20px;
   padding: 20px;
-}
-
-.TodoList ul {
-  text-align: left;
 }
