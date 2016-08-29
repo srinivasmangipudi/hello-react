@@ -47,8 +47,10 @@ var AwareCanvas = React.createClass({
     console.log("--handleClick");
     e.preventDefault();
     var ist = this.state.isSelected;
+    var count = this.readServer();
     this.setState({isSelected: ist});
     console.log("start:"+ ist);
+    // console.log(this.firebaseRefs.valueOf());
 
     if(ist === "true"){
       console.log("1");
@@ -56,6 +58,7 @@ var AwareCanvas = React.createClass({
         console.log(this.state);
         this.updateCanvas();
       });      
+      this.firebaseRefs.awareUsersNow.set(count-1);
     }
     else
     {
@@ -63,7 +66,8 @@ var AwareCanvas = React.createClass({
       this.setState({isSelected: "true"}, () => {
         console.log(this.state);
         this.updateCanvas();
-      });      
+      });
+      this.firebaseRefs.awareUsersNow.set(count+1);
     }
 
     console.log("check:" + this.state.isSelected);
@@ -74,7 +78,7 @@ var AwareCanvas = React.createClass({
   readServer: function() {
     console.log("--readserver called - awareUsersNow:");
     var awareUsersNow = this.state.awareUsersNow;
-    console.log(awareUsersNow[".value"]);
+    console.log(awareUsersNow);
 
     return awareUsersNow[".value"];
     
@@ -86,6 +90,8 @@ var AwareCanvas = React.createClass({
     console.log("--update canvas called");
     console.log(this.state);
     const ctx = this.refs.canvas.getContext('2d');
+    ctx.textBaseline = 'middle';
+    ctx.textAlign="middle";
     let isSelected = this.state.isSelected;
     var fillStyle = '#000000';
 
@@ -103,7 +109,17 @@ var AwareCanvas = React.createClass({
       ctx.fillStyle = "#ffffff";
       ctx.font = "bold 16px Arial";
       var txtxt = this.readServer() + " people are touching";
-      ctx.fillText(txtxt, 100, 100);
+      var textWidth = ctx.measureText(txtxt ).width;
+
+      ctx.fillText(txtxt , (this.refs.canvas.width/2) - (textWidth / 2), 100);      
+    }
+    else{
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 16px Arial";
+      var txtxt = "Touch to be Aware";
+      var textWidth = ctx.measureText(txtxt ).width;
+
+      ctx.fillText(txtxt , (this.refs.canvas.width/2) - (textWidth / 2), 100);
     }
   },
   render: function() {
