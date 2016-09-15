@@ -6,7 +6,7 @@
     "react-scripts": "0.2.1"
   },
   "dependencies": {
-    "firebase": "^3.3.0",
+    "firebase": "^3.3.2",
     "firebase-queue": "^1.5.0",
     "jquery": "^3.1.0",
     "processing-js": "^1.6.0",
