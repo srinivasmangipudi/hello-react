@@ -45,20 +45,6 @@ var AwareCanvas = React.createClass({
 
 
   },
-  // getAwareCount: function() {
-  //   var count = 0;
-  //   var parent = this;
-  //   awareUsersCountRef.on('value', function(snapshot) {
-  //       console.log("awareUsersCountRef change detected--");
-  //       console.log(snapshot["A"]["B"]);
-  //       count = snapshot["A"]["B"];
-
-  //       //parent.setState({awareUsersNow: count});
-  //       parent.updateCanvas();
-  //       //return count;
-  //     }).bind(this);
-  //   console.log(this.state);
-  // },
   loggedIn: function(user) {
     console.log("hey react!!");
     console.log(user);
@@ -138,6 +124,8 @@ var AwareCanvas = React.createClass({
       this.updateCountOnClose();
       return ev.returnValue = 'Are you sure you want to close?';
     });
+
+    //init();
   },
   getAwareCount: function() {
     var count = 0;
@@ -243,6 +231,53 @@ var AwareCanvas = React.createClass({
     //this.updateCanvas();
 
   },
+  handleTouch: function(e) {
+    //alert("--handleTouch");
+    e.preventDefault();
+    this.setState({isSelected: "true"}, () => {
+        console.log(this.state);
+        this.updateCanvas();
+      });
+      //this.firebaseRefs.awareUsersNow.set(this.state.awareUsersNow+1);
+
+      //on click log anonymously and update states
+      console.log(this.state.isLoggedIn);
+      //let loggedIn = this.state.isLoggedIn;
+      console.log(this.userObj);
+      if(this.userObj === undefined)
+      {
+        console.log("start loggin in firebase anon");
+        firebase.auth().signInAnonymously().catch(function(error) {
+          // Handle Errors here.
+          var errorCode = error.code;
+          var errorMessage = error.message;
+          console.log("--auth error");
+          console.log(errorCode + " : " + errorMessage);
+        });
+
+        var self=this;
+        firebase.auth().onAuthStateChanged(function(user) {
+          console.log("--auth state changed");
+          self.loggedIn(user);
+        });              
+      }
+      else
+      {
+        this.loggedIn(this.userObj);
+      }
+
+    console.log("check:" + this.state.isSelected);  
+  },
+  handleUntouch: function(e) {
+    //alert("--handleUnTouch");
+    e.preventDefault();
+    this.firebaseRefs.awareUsersList.child(this.state.userId).remove();
+
+    this.setState({isSelected: "false"}, () => {
+      console.log(this.state);
+      this.updateCanvas();
+    });     
+  },
   readServer: function() {
     console.log("--readserver called - awareUsersNow:");
     var awareUsersNow = this.state.awareUsersNow;
@@ -316,6 +351,7 @@ var AwareCanvas = React.createClass({
       return (
         <div className="awareCanvas">
                 <canvas id="awareCanvas" ref="canvas" onClick={this.handleClick} 
+                  onTouchStart={this.handleTouch} onTouchEnd={this.handleUntouch}
                   style={style} width={300} height={300}/>          
         </div>
       );
@@ -323,49 +359,36 @@ var AwareCanvas = React.createClass({
 });
 //end -- aware canvas react component
 
-/*
-          <div id="outer-container">
-            <div className="bm-burger-button">openmenu</div>
-            // <Menu pageWrapId={ "page-wrap" } 
-            //       outerContainerId={ "outer-container" } 
-            //       width={280}/>
-            <main id="page-wrap">
-              <div className="awareCanvas">
-                <canvas id="awareCanvas" ref="canvas" onClick={this.handleClick} 
-                  style={style} width={300} height={300}/>          
-              </div>
-           </main>
-          </div>
+// function init() {
+//   canvas = document.getElementById('awareCanvas');
+//   console.log(canvas);
+//   canvas.addEventListener("touchstart", touchHandler, false);
+//   canvas.addEventListener("touchmove", touchHandler, false);
+//   canvas.addEventListener("touchend", touchHandler, false);
+// }
 
-*/
+// function touchHandler(event) {
+//   if (event.targetTouches.length == 1) { //one finger touche
+//     var touch = event.targetTouches[0];
 
-function init() {
-  canvas.addEventListener("touchstart", touchHandler, false);
-  canvas.addEventListener("touchmove", touchHandler, false);
-  canvas.addEventListener("touchend", touchHandler, false);
-}
-
-function touchHandler(event) {
-  if (event.targetTouches.length == 1) { //one finger touche
-    var touch = event.targetTouches[0];
-
-    if (event.type == "touchstart") {
-      alert('touchstart');
-      // rect.startX = touch.pageX;
-      // rect.startY = touch.pageY;
-      drag = true;
-    } else if (event.type == "touchmove") {
-      alert('touchmove');
-      if (drag) {
-        // rect.w = touch.pageX - rect.startX;
-        // rect.h = touch.pageY - rect.startY ;
-        draw();
-      }
-    } else if (event.type == "touchend" || event.type == "touchcancel") {
-      drag = false;
-    }
-  }
-}
+//     if (event.type == "touchstart") {
+//       AwareCanvas.handleTouch();
+//       //alert('touchstart');
+//       // rect.startX = touch.pageX;
+//       // rect.startY = touch.pageY;
+//       drag = true;
+//     } else if (event.type == "touchmove") {
+//       alert('touchmove');
+//       if (drag) {
+//         // rect.w = touch.pageX - rect.startX;
+//         // rect.h = touch.pageY - rect.startY ;
+//         draw();
+//       }
+//     } else if (event.type == "touchend" || event.type == "touchcancel") {
+//       drag = false;
+//     }
+//   }
+// }
 export default AwareCanvas;
 
 
@@ -415,6 +438,20 @@ export default AwareCanvas;
                         
     //                         databaseURL: "https://project-2569167554904200855.firebaseio.com"
     //                       });
+  // getAwareCount: function() {
+  //   var count = 0;
+  //   var parent = this;
+  //   awareUsersCountRef.on('value', function(snapshot) {
+  //       console.log("awareUsersCountRef change detected--");
+  //       console.log(snapshot["A"]["B"]);
+  //       count = snapshot["A"]["B"];
+
+  //       //parent.setState({awareUsersNow: count});
+  //       parent.updateCanvas();
+  //       //return count;
+  //     }).bind(this);
+  //   console.log(this.state);
+  // },
 
 
     // try{
